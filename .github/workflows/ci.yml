@@ -1,42 +1,44 @@
-name: CI for Docker with ECR
+name: Build and Push Docker Image to ECR
 
 on:
   push:
     branches:
-      - master  # Change to 'main' if that's your default branch
+      - master    # Will trigger on the default branch (usually main or master)
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout source code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3  # UPDATED TO v3
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}  # Make AWS region configurable in secrets
 
-      - name: Log in to AWS ECR
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          region: ap-south-1
+      # Step 3: Login to Amazon ECR
+      - name: Login to AWS ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker image
+      # Step 4: Set Docker repository variables (make ECR repository and tag configurable)
+      - name: Set Docker environment variables
         run: |
-          docker build -t cafe .
+          echo "ECR_REGISTRY=${{ secrets.AWS_ECR_REGISTRY }}" >> $GITHUB_ENV  # ECR registry stored in secrets
+          echo "ECR_REPOSITORY=${{ secrets.AWS_ECR_REPOSITORY }}" >> $GITHUB_ENV  # Repository name from secrets
+          echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV  # Use commit SHA as image tag for versioning
 
-      - name: Tag Docker image for ECR
+      # Step 5: Build Docker image
+      - name: Build Docker Image
         run: |
-          docker tag cafe:latest 369668972483.dkr.ecr.ap-south-1.amazonaws.com/cafe:latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
-      - name: Push Docker image to ECR
+      # Step 6: Push Docker image to ECR
+      - name: Push Docker Image to ECR
         run: |
-          docker push 369668972483.dkr.ecr.ap-south-1.amazonaws.com/cafe:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
