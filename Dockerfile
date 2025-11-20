@@ -21,3 +21,14 @@ EXPOSE 80
  
 # Start Apache2 in the foreground
 CMD ["apachectl", "-D", "FOREGROUND"]
+
+#FROM ubuntu:20.04
+#ENV DEBIAN_FRONTEND=noninteractive
+#RUN apt-get update && \
+    #apt-get install -y apache2 && \
+    #apt-get clean
+#WORKDIR /var/www/html
+#COPY ./cafefiles/ /var/www/html/
+#ADD nano.tar.gz .
+#EXPOSE 80
+#CMD ["apachectl", "-D", "FOREGROUND"]
