@@ -29,3 +29,5 @@ echo "Patching ArgoCD service to use LoadBalancer..."
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 echo "ArgoCD installation completed."
+#kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
