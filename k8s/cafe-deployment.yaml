@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-deployment
+  labels:
+    app: cafe
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cafe
+  template:
+    metadata:
+      labels:
+        app: cafe
+    spec:
+      containers:
+      - name: cafe-container
+        image: 369668972483.dkr.ecr.ap-south-1.amazonaws.com/cafe:latest
+        ports:
+        - containerPort: 80

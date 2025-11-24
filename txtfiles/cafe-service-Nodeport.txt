@@ -1,0 +1,13 @@
+ubuntu@ip-172-31-4-163:~/images/cafe$ cat cafe-service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-service
+spec:
+  type: NodePort           # change from ClusterIP to NodePort
+  selector:
+    app: cafe
+  ports:
+    - port: 80             # internal cluster port
+      targetPort: 80       # container port
+      nodePort: 30081  

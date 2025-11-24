@@ -1,0 +1,12 @@
+ubuntu@ip-172-31-4-163:~/images/cafe$ cat cafe-service-clusterip.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-service
+spec:
+  type: ClusterIP
+  selector:
+    app: cafe
+  ports:
+    - port: 80
+      targetPort: 80
