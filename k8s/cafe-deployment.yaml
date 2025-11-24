@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cafe-deployment
+  name: cafe-deployment #the
   labels:
     app: cafe
 spec:
